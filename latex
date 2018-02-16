@@ -1,0 +1,4 @@
+#!/bin/bash
+
+touch $1.tex;
+echo -e \\documentclass\[10pt, a4paper\]\{article\}"\n\n"\\usepackage \[T1\]\{fontenc\}"\n"\\usepackage \[utf8\]\{inputenc\}"\n"\\usepackage \[francais\]\{babel\}"\n"\\ title \{$1\}"\n\n"\\ "\b"begin \{document\}"\n"\\maketitle"\n\n"\\ "\b"end \{document\} > $1.tex;

@@ -1,0 +1,73 @@
+#!/bin/bash
+
+compilation ()
+{
+    pdflatex $1;
+    pdflatex $1;
+    pdflatex $1;
+}
+
+usage ()
+{
+    echo "Usage :"
+    echo "Sans arguments : Fichier .tex"
+    echo "-b : Compile avec la bibliothèque"
+}
+
+open_pdf()
+{
+    str=${1::-4}
+    echo "Do you want to open $str.pdf?";
+    select yn in "Yes" "No";
+    do
+	case $yn in
+	    Yes ) evince $str.pdf & break;;
+	    No  ) break;;
+	esac
+    done
+}
+
+
+delete_all ()
+{
+    str=${1::-4}
+    echo "Do you want to delete $str.aux, $str.bbl, $str.blg, $str.log, $str.out $str.pdf and $str.toc"
+    select yn in "Yes" "No"; do
+	case $yn in
+	    Yes ) rm -f $str.aux $str.bbl $str.blg $str.log $str.out $str.pdf $str.toc; break;;
+	    No  ) break;;
+	esac
+    done
+}
+
+
+###Compilation###
+
+# Sans paramètres
+if (( $# == 1 )); then
+    compilation $1;
+# Avec Bibliothèque
+elif (( $# == 2 )); then
+    if [[ "$1" == "-b" ]]; then
+	str=${2::-4}
+	echo "$str"
+	compilation $str.tex;
+	bibtex $str.aux
+	compilation $str.tex;
+    elif [[ "$1" == "-d" ]];then
+	delete_all $2;
+	exit;
+    else
+	usage;
+    fi
+fi
+
+###Affichage###
+
+if (( $# == 1 )); then
+    open_pdf $1;
+    delete_all $1;
+elif (( $# == 2 )); then
+    open_pdf $2;
+    delete_all $2;
+fi

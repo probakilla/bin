@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Attention, ceci est un yolo script et peut potentiellement
+# kill des trucs qu'il ne faut pas :]
+
+function func_usage ()
+{
+    echo "Warning, this script may kill unwanted process."
+    echo "Usage : rip [options] <process_name>"
+    echo ""
+    echo "Without options, this send SIGTERM to all process found."
+    echo ""
+    echo "Option list :"
+    echo "   -k : Send SIGKILL to all process found."
+    echo "   -t : Send SIGTERM to all process found."
+}
+
+# Le prmier paramètre est le nom du processus.
+# Le deuxieme est le numéro du signal.
+function kill_loop ()
+{
+    # Nombres de processus trouvé avec le paramètre d'entrée.
+   NB_LINES=$(ps -ux | grep $1 | wc | cut -b 5-7)
+   NB_ZBI=$(($NB_LINES - 2)) # On enlève 2 au NB_LINES parce que ??????
+
+   # Si NB_LINES est égal à 3, alors le processus n'est pas trouve.
+   if [ $NB_LINES -eq 3 ]; then
+       echo "ERROR : Process not found"
+       exit
+   fi
+   # Envoie SIGKILL à tout les processus trouves.
+   for i in `seq 1 $NB_ZBI`; do
+       PID=$(ps -ux | grep $1 | cut -b 10-15 | sed -n $i\p)
+       kill -$2 $PID 2> /dev/null
+       echo "process $PID $3."
+   done
+}
+
+   
+# Cas par defaut (envoie un sigterm)
+if [ $# -eq 1 ]; then
+    # 15 est le numéro de sigterm.
+    kill_loop $1 15 "terminated"
+    
+elif [ $# -eq 2 ]; then
+    if [[ "$1" -eq "-k" ]]; then
+        kill_loop $2 9 "killed"
+	
+    elif [[ "$1" -eq "-t" ]]; then
+	kill_loop $2 15 "terminated"
+	
+    else
+	func_usage
+    fi
+else
+    func_usage
+fi

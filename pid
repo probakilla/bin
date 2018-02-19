@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage : pid <process name>"
+
+else
+    ps -ux | grep $1 ;
+fi

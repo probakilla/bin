@@ -4,6 +4,36 @@
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 
+;; p-ins ->
+;; ==== Packages installés ====
+;; Coding Style :
+;; 	fill-column-indicator
+;; Auto Completion :
+;; 	auto-complete
+;; 	ac-c-header
+;; 	ac-clang
+;;	ac-etags
+;;	ac-ispell
+;;	auto-complete-auctex
+;;	auto-complete-c-headers
+;;	auto-complete-clang
+;;	auto-comlete-exuberant-ctags
+;;	auto-complete-clang-async
+;; Curseur Multiples :
+;;	ace-jump-mode
+;;	multiple-cursor
+;;	dash
+;;	ace-mc (a besoin des 3 derniers)
+;;		C-)   -> Ajouter plusieur curseurs
+;;		C-M-) -> Ajouter un curseur
+;; LateX :
+;;	auctex
+;; Misc :
+;;	auto-correct
+;;	auto-package-update
+;;	bash-completion
+;;	autopair
+
 ;; ==== CODDING STYLE ====
 (package-initialize)
 
@@ -16,14 +46,25 @@
 (setq c-default-style "linux"
 	c-basic-offset 4)
 
+(require 'autopair)
+(autopair-global-mode)
 ;; ==== CODDING STYLE ====
+
+;; ==== MISC ====
+(require 'bash-completion)
+(bash-completion-setup)
+;; ==== MISC ====
 
 ;; ==== CUSTOM BINDS ====
 (global-set-key (kbd "C-?") 'help-command)
 (global-set-key (kbd "M-?") 'mark-paragraph)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "M-h") 'backward-kill-word)
+;; Return before M-.
 (global-set-key (kbd "M-*") 'pop-tag-mark)
+;; Multiples curors
+(global-set-key (kbd "C-)") 'ace-mc-multiple-cursors)
+(global-set-key (kbd "C-M-)") 'ace-mc-add-single-cursor)
 ;; ==== CUSTOM BINDS ====
 
 

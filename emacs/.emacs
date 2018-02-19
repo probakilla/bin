@@ -65,6 +65,8 @@
 ;; Multiples curors
 (global-set-key (kbd "C-)") 'ace-mc-multiple-cursors)
 (global-set-key (kbd "C-M-)") 'ace-mc-add-single-cursor)
+;; Etags
+(global-set-key (kbd "C-e") 'visit-tag-table)
 ;; ==== CUSTOM BINDS ====
 
 

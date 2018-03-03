@@ -64,7 +64,7 @@
 ;; Starting with auto-complete-mode
 (ac-config-default)
 (global-auto-complete-mode t)
-(add-to-list 'ac-modes 'c++-mode)
+;;(add-to-list 'ac-modes 'c++-mode 'auctex)
 ;; Stating with fci-mode
 (define-globalized-minor-mode my-global-fci-mode fci-mode turn-on-fci-mode)
 (my-global-fci-mode 1)

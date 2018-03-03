@@ -57,20 +57,29 @@
 (require 'autopair)
 (autopair-global-mode)
 
+;; Auto completion packages
 (autoload 'bash-completion-dynamic-complete 
    "bash-completion"
    "BASH completion hook")
  (add-hook 'shell-dynamic-complete-functions
 	   'bash-completion-dynamic-complete)
 
+;; Ispell package
 (add-hook 'git-commit-mode-hook 'ac-ispell-ac-setup)
 (add-hook 'mail-mode-hook 'ac-ispell-ac-setup)
 
+;; Auto correct package
 (add-hook
  'org-mode-hook
  (lambda ()
    setq auto-correct-predicate
-    (lambda () (not (org-in-src-block-p)))))
+   (lambda () (not (org-in-src-block-p)))))
+
+;; Auto resize package
+(add-hook 'after-init-hook (lambda ()
+      (when (fboundp 'auto-dim-other-buffers-mode)
+        (auto-dim-other-buffers-mode t))))
+
 ;; ==== CODDING STYLE ====
 
 ;; ==== MISC ====
@@ -111,7 +120,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (bash-completion auto-package-update auto-complete-auctex ac-ispell ac-etags ac-clang auto-complete-sage auto-complete-pcmp auto-complete-nxml auto-complete-clang-async bison-mode auto-correct auto-complete-exuberant-ctags auto-complete-clang auto-complete-c-headers))))
+    (auto-dim-other-buffers bash-completion auto-package-update auto-complete-auctex ac-ispell ac-etags ac-clang auto-complete-sage auto-complete-pcmp auto-complete-nxml auto-complete-clang-async bison-mode auto-correct auto-complete-exuberant-ctags auto-complete-clang auto-complete-c-headers))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

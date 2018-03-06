@@ -9,9 +9,11 @@ compilation ()
 
 usage ()
 {
-    echo "Usage :"
-    echo "Sans arguments : Fichier .tex"
-    echo "-b : Compile avec la bibliothèque"
+    echo "Usage : cplatex [options] <file_name>.tex"
+    echo "Options list :"
+    echo -e "\t -b : Compile with BibTex."
+    echo -e "\t -c : Clean the latex directory."
+    echo -e "\t -d : Display the pdf corresponding to the .tex"
 }
 
 open_pdf()
@@ -40,34 +42,37 @@ delete_all ()
     done
 }
 
-
 ###Compilation###
 
 # Sans paramètres
 if (( $# == 1 )); then
-    compilation $1;
+    if [[ "$1" == "-h" ]];then
+	usage;
+	exit;
+    else
+	compilation $1;
+	exit;
+    fi
 # Avec Bibliothèque
 elif (( $# == 2 )); then
     if [[ "$1" == "-b" ]]; then
 	str=${2::-4}
-	echo "$str"
 	compilation $str.tex;
 	bibtex $str.aux
 	compilation $str.tex;
-    elif [[ "$1" == "-d" ]];then
+	exit;
+    elif [[ "$1" == "-c" ]];then
 	delete_all $2;
+	exit;
+    elif [[ "$1" == "-d" ]]; then
+	open_pdf $2;
 	exit;
     else
 	usage;
+	exit;
     fi
+else
+    usage;
+    exit;
 fi
 
-###Affichage###
-
-if (( $# == 1 )); then
-    open_pdf $1;
-    delete_all $1;
-elif (( $# == 2 )); then
-    open_pdf $2;
-    delete_all $2;
-fi

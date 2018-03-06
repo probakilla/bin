@@ -1,0 +1,16 @@
+#!/bin/bash
+
+touch $1.tex;
+echo "\documentclass [10pt, a4paper]{article}" >> $1.tex
+echo  >> $1.tex
+echo "\usepackage [T1]{fontenc}"  >> $1.tex
+echo "\usepackage [utf8]{inputenc}" >> $1.tex
+echo "\usepackage [fracais]{babel}" >> $1.tex
+echo "\author {Jacky Laffrite}" >> $1.tex
+echo "\title {$1}" >> $1.tex
+echo >> $1.tex
+echo >> $1.tex
+echo "\begin {document}" >> $1.tex
+echo "\maketitle" >> $1.tex
+echo >> $1.tex
+echo "\end {document}" >> $1.tex

@@ -46,7 +46,7 @@ delete_all ()
 
 # Sans paramètres
 if (( $# == 1 )); then
-    if [[ "$1" == "-h" ]];then
+    if [ "$1" == "-h" ];then
 	usage;
 	exit;
     else
@@ -55,16 +55,16 @@ if (( $# == 1 )); then
     fi
 # Avec Bibliothèque
 elif (( $# == 2 )); then
-    if [[ "$1" == "-b" ]]; then
+    if [ "$1" == "-b" ]; then
 	str=${2::-4}
 	compilation $str.tex;
 	bibtex $str.aux
 	compilation $str.tex;
 	exit;
-    elif [[ "$1" == "-c" ]];then
+    elif [ "$1" == "-c" ];then
 	delete_all $2;
 	exit;
-    elif [[ "$1" == "-d" ]]; then
+    elif [ "$1" == "-d" ]; then
 	open_pdf $2;
 	exit;
     else

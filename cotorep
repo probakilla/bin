@@ -55,10 +55,11 @@ if [ "$#" -eq 0 ] ; then
     soft="";
     
     echo "Do you want to clone from Github or savane ?"
-    select yn in "Savane" "Github"; do
+    select yn in "Savane" "Github" "Please help, i am a COTOREP !"; do
 	case $yn in
 	    Github ) repo="github"; break;;
 	    Savane ) repo="savane"; break;;
+	    "Please help, i am a COTOREP !" ) firefox https://www.youtube.com/watch?v=SIaU1JLGLd4 ; exit;;
 	esac
     done
     

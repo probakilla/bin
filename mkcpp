@@ -1,0 +1,60 @@
+#!/bin/bash
+
+#touch $1.hpp $1.cpp
+
+function usage ()
+{
+    echo "USAGE : mkcpp <filename>"
+}
+
+if [ $# -eq 1 ] ; then
+
+    touch $1.hpp
+    str=$(echo -n $1 | awk '{print toupper($0)}')
+    # HEADER 
+    echo \#ifndef $str\_HPP >> $1.hpp;
+    echo \#define $str\_HPP >> $1.hpp;
+    echo "" >> $1.hpp;
+
+    # SRC
+    echo \#include \"$1.hpp\" >> $1.cpp;
+    echo "" >> $1.cpp;
+ 
+    class="";
+    namespace="false";
+    echo "Do you want to create a namespace"
+    select yn in "Yes" "No"; do
+	case $yn in
+	    Yes ) read -p "Enter a name : " class;
+		  namespace="true";
+		  echo "namespace $class" >> $1.hpp;
+		  echo "namespace $class" >> $1.cpp;
+		  echo "{" >> $1.hpp;
+		  echo "{" >> $1.cpp;
+		  break;;
+	    No  ) break;;
+	esac
+    done
+
+    # HEADER 
+    echo -e "  class $1" >> $1.hpp;
+    echo -e "  {" >> $1.hpp;
+    echo "" >> $1.hpp;
+    echo -e "    $1 ();" >> $1.hpp;
+    echo -e "    ~$1 ();" >> $1.hpp;
+    echo -e "  };" >> $1.hpp;
+
+    # SRC
+    echo -e "  $1::$1 () {}" >> $1.cpp;
+    echo "" >> $1.cpp;
+    echo -e "  $1::~$1 () {}" >> $1.cpp;
+    
+    if [ "$namespace" == "true" ] ; then
+	echo -e "}" >> $1.hpp;
+	echo -e "}" >> $1.cpp;
+    fi
+		 
+    echo \#endif /\* !defined\($str\_HPP\) \*/ >> $1.hpp;
+else
+    usage
+fi

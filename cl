@@ -1,5 +1,6 @@
 #!/bin/bash
 
-rm *~ 2> /dev/null;
-rm \#* 2> /dev/null;
-echo "cleared";
+find . -type f -name '*~' -delete 2> /dev/null;
+find . -type f -name '\#*' -delete 2> /dev/null;
+
+echo " --- cleared ---";

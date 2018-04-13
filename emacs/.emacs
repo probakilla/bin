@@ -5,92 +5,19 @@
 
 ;; p-ins ->
 ;; ==== Packages installés ====
-;; Coding Style :
-;;      fill-column-indicator
 ;; Auto Completion :
 ;;      auto-complete
 ;;      ac-c-header
 ;;      ac-clang
 ;;      ac-etags
-;;      ac-ispell
-;;      auto-complete-auctex
 ;;      auto-complete-c-headers
 ;;      auto-complete-clang
-;;      auto-comlete-exuberant-ctags
-;;      auto-complete-clang-async
-;; Curseur Multiples :
-;;      ace-jump-mode
-;;      multiple-cursor
-;;      dash
-;;      ace-mc (a besoin des 3 derniers)
-;;              C-)   -> Ajouter plusieur curseurs
-;;              C-M-) -> Ajouter un curseur
-;; LateX :
-;;      auctex
+;;      yasnippets
 ;; Misc :
 ;;      auto-correct
 ;;      auto-package-update
 ;;      bash-completion
 ;;      autopair
-;;      srefactor
-
-;; Initializing emacs packages.
-(package-initialize)
-
-;; ==== PACKAGE LOAD MANAGEMENT ====
-;; fill-column-indicator package - auto launch.
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'fill-column-indicator)
-;; Bash completion for commmands ('M-x') - auto lauch.
-(require 'bash-completion)
-(bash-completion-setup)
-;; Auto pair chars like parenthesis or braces - auto launch.
-(require 'autopair)
-(autopair-global-mode)
-;; Refactoring C/C++ and lisp.
-(require 'srefactor)
-(require 'srefactor-lisp)
-;; OPTIONAL: ADD IT ONLY IF YOU USE C/C++.
-(semantic-mode 1) ;; -> this is optional for Lisp
-;; ==== PACKAGE LOAD MANAGEMENT ====
-
-;; ==== CODING STYLE ====
-;; Color and column number for full-column-indicator.
-(setq fci-rule-color "pink")
-(setq fci-rule-column 80)
-;; Indentation and style for braces (if, then, else, while etc...)
-(setq c-default-style "linux"
-      c-basic-offset 2)
-;; Starting with auto-complete-mode
-(ac-config-default)
-(global-auto-complete-mode t)
-;;(add-to-list 'ac-modes 'c++-mode 'auctex)
-;; Stating with fci-mode
-(define-globalized-minor-mode my-global-fci-mode fci-mode turn-on-fci-mode)
-(my-global-fci-mode 1)
-;; ==== CODING STYLE ====
-
-;; ==== CUSTOM BINDS ====
-(global-set-key (kbd "C-?") 'help-command)
-(global-set-key (kbd "M-?") 'mark-paragraph)
-(global-set-key (kbd "C-h") 'delete-backward-char)
-(global-set-key (kbd "M-h") 'backward-kill-word)
-;; Return before M-.
-(global-set-key (kbd "M-*") 'pop-tag-mark)
-;; Multiples curors.
-(global-set-key (kbd "C-)") 'ace-mc-multiple-cursors)
-(global-set-key (kbd "C-M-)") 'ace-mc-add-single-cursor)
-;; Tags
-(global-set-key (kbd "C-e") 'visit-tags-table)
-;; Refactor binds.
-(define-key c-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
-(define-key c++-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
-(global-set-key (kbd "M-RET o") 'srefactor-lisp-one-line)
-(global-set-key (kbd "M-RET m") 'srefactor-lisp-format-sexp)
-(global-set-key (kbd "M-RET d") 'srefactor-lisp-format-defun)
-(global-set-key (kbd "M-RET b") 'srefactor-lisp-format-buffer)
-;; ==== CUSTOM BINDS ====
-
 
 ;; ==== INITIALIZE PACKAGE ARCHIVES ====
 ;; Initializing Melpa.
@@ -102,12 +29,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ac-etags-requires 1)
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
+ '(custom-enabled-themes (quote (manoj-dark)))
  '(package-selected-packages
    (quote
-    (srefactor ac-clang auto-complete-sage auto-complete-pcmp \\
-               auto-complete-nxml auto-complete-clang-async bison-mode \\
-               auto-correct auto-complete-exuberant-ctags auto-complete-clang\\
-               auto-complete-c-headers))))
+    (iedit yasnippet yasnippet-snippets ac-c-headers ac-clang auto-complete-sage auto-complete-pcmp \\ auto-complete-nxml auto-complete-clang-async bison-mode \\ auto-correct auto-complete-exuberant-ctags auto-complete-clang\\ auto-complete-c-headers))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -115,3 +45,76 @@
  ;; If there is more than one, they won't work right.
  )
 ;; ==== INITIALIZE PACKAGE ARCHIVES ====
+
+;; ==== PACKAGE LOAD MANAGEMENT ====
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+;; Auto pair chars like parenthesis or braces - auto launch.
+(require 'autopair)
+(autopair-global-mode)
+
+;; Auto-update - auto launch
+(add-to-list 'load-path "/path/to/auto-package-update")
+(require 'auto-package-update)
+;; OPTIONAL: ADD IT ONLY IF YOU USE C/C++.
+(semantic-mode 1) ;; -> this is optional for Lisp
+
+;; Starting with auto-complete-mode
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+;; Starting with yasnippet (auto generate if statements etc...)
+(require 'yasnippet)
+(yas-global-mode 1)
+
+(defun my:ac-c-headers-init ()
+  (require 'auto-complete-c-headers)
+  (add-to-list 'ac-sources 'ac-source-c-headers)
+  (add-to-list 'achead:include-directories '" /usr/include/c++/6
+ /usr/include/x86_64-linux-gnu/c++/6
+ /usr/include/c++/6/backward
+ /usr/lib/gcc/x86_64-linux-gnu/6/include
+ /usr/local/include
+ /usr/lib/gcc/x86_64-linux-gnu/6/include-fixed
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+"))
+
+(add-hook 'c++-mode-hook 'my:ac-c-headers-init)
+(add-hook 'c-mode-hook 'my:ac-c-headers-init)
+
+;; Turn on Semantic
+(semantic-mode 1)
+;; Function to suggest Semantic an auto complete
+(defun my:add-semantic-to-autocomplete()
+  (add-to-list 'ac-sources 'ac-source-semantic))
+(add-hook 'c-mode-common-hook 'my:add-semantic-to-autocomplete)
+
+;; Turn on ede mode
+(global-ede-mode 1)
+;; Tell ede where the project is
+;; Reversi project
+(ede-cpp-root-project "reversi" :file "~/fac/reversi/code/src/main.cc"
+		      :include-path '("~/fac/reversi/code/include/core"
+				      "~/fac/reversi/code/include/player"))
+(ede-cpp-root-project "reversi_test" :file "~/fac/reversi/code/tests_main.cc"
+		      :include-path '("./include"))
+;; ==== PACKAGE LOAD MANAGEMENT ====
+
+;; ==== CODING STYLE ====
+;; Indentation and style for braces (if, then, else, while etc...)
+(setq c-default-style "linux"
+      c-basic-offset 2)
+;; ==== CODING STYLE ====
+
+;; ==== CUSTOM BINDS ====
+(global-set-key (kbd "C-?") 'help-command)
+(global-set-key (kbd "M-?") 'mark-paragraph)
+(global-set-key (kbd "C-h") 'delete-backward-char)
+(global-set-key (kbd "M-h") 'backward-kill-word)
+;; Return before M-.
+(global-set-key (kbd "M-*") 'pop-tag-mark)
+;; Tags
+(global-set-key (kbd "C-e") 'visit-tags-table)
+;; Iedit bind
+(global-set-key (kbd "C-;") 'iedit-mode)
+;; ==== CUSTOM BINDS ====

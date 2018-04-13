@@ -61,27 +61,32 @@ function check_tex ()
 while getopts ":b:c:d:p:h" opt ; do
     case $opt in
         b )
-	    check_tex $OPTARG;
-	    str=${OPTARG::-4}
+            check_tex $OPTARG;
+            str=${OPTARG::-4}
             compilation $OPTARG;
             bibtex $str.aux
             compilation $OPTARG;
+	    exit;
             break;;
         c )
-	    check_tex $OPTARG;
+            check_tex $OPTARG;
             delete_all $OPTARG;
+	    exit;
             break;;
         d )
-	    check_tex $OPTARG;
+            check_tex $OPTARG;
             open_pdf $OPTARG
+	    exit;
             break;;
         h )
             usage
+	    exit;
             break;;
-	p )
-	    check_tex $OPTARG;
-	    compilation $OPTARG
-	    break;;
+        p )
+            check_tex $OPTARG;
+            compilation $OPTARG
+	    exit
+            break;;
         \?)
             echo "Invalid option -$OPTARG"
             exit 1;
@@ -92,3 +97,5 @@ while getopts ":b:c:d:p:h" opt ; do
             break;;
     esac
 done
+
+compilation $1;

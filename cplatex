@@ -1,78 +1,101 @@
 #!/bin/bash
 
-compilation ()
+function compilation ()
 {
     pdflatex $1;
     pdflatex $1;
     pdflatex $1;
 }
 
-usage ()
+function usage ()
 {
     echo "Usage : cplatex [options] <file_name>.tex"
     echo "Options list :"
     echo -e "\t -b : Compile with BibTex."
     echo -e "\t -c : Clean the latex directory."
     echo -e "\t -d : Display the pdf corresponding to the .tex"
+    echo -e "\t -h : Display list of options"
 }
 
-open_pdf()
+function open_pdf()
 {
     str=${1::-4}
     echo "Do you want to open $str.pdf?";
     select yn in "Yes" "No";
     do
-	case $yn in
-	    Yes ) evince $str.pdf & break;;
-	    No  ) break;;
-	esac
+        case $yn in
+            Yes ) evince $str.pdf & break;;
+            No  ) break;;
+        esac
     done
 }
 
 
-delete_all ()
+function delete_all ()
 {
     str=${1::-4}
-    echo "Do you want to delete $str.aux, $str.bbl, $str.blg, $str.log, $str.out $str.pdf and $str.toc"
+    echo -n "Do you want to delete $str.aux, $str.bbl, $str.blg, $str.log,"
+    echo " $str.out $str.pdf and $str.toc"
     select yn in "Yes" "No"; do
-	case $yn in
-	    Yes ) rm -f $str.aux $str.bbl $str.blg $str.log $str.out $str.pdf $str.toc; break;;
-	    No  ) break;;
-	esac
+        case $yn in
+            Yes )
+                rm -f $str.aux $str.bbl $str.blg $str.log;
+                rm $str.out $str.pdf $str.toc;
+                break;;
+            No  )
+                break;;
+        esac
     done
 }
 
-###Compilation###
-
-# Sans paramètres
-if (( $# == 1 )); then
-    if [ "$1" == "-h" ];then
-	usage;
-	exit;
-    else
-	compilation $1;
-	exit;
+function check_tex ()
+{
+    if [ "${1:(-4)}" != ".tex" ] ; then
+        echo "Argument must be a '.tex' file.";
+        exit 1;
     fi
-# Avec Bibliothèque
-elif (( $# == 2 )); then
-    if [ "$1" == "-b" ]; then
-	str=${2::-4}
-	compilation $str.tex;
-	bibtex $str.aux
-	compilation $str.tex;
-	exit;
-    elif [ "$1" == "-c" ];then
-	delete_all $2;
-	exit;
-    elif [ "$1" == "-d" ]; then
-	open_pdf $2;
-	exit;
-    else
-	usage;
-	exit;
-    fi
-else
-    usage;
-    exit;
-fi
+}
 
+### OPTION PARSING ###
+
+while getopts ":b:c:d:p:h" opt ; do
+    case $opt in
+        b )
+            check_tex $OPTARG;
+            str=${OPTARG::-4}
+            compilation $OPTARG;
+            bibtex $str.aux
+            compilation $OPTARG;
+	    exit;
+            break;;
+        c )
+            check_tex $OPTARG;
+            delete_all $OPTARG;
+	    exit;
+            break;;
+        d )
+            check_tex $OPTARG;
+            open_pdf $OPTARG
+	    exit;
+            break;;
+        h )
+            usage
+	    exit;
+            break;;
+        p )
+            check_tex $OPTARG;
+            compilation $OPTARG
+	    exit
+            break;;
+        \?)
+            echo "Invalid option -$OPTARG"
+            exit 1;
+            break;;
+        : )
+            echo "Option -$OPTARG requires an argument"
+            exit 1;
+            break;;
+    esac
+done
+
+compilation $1;

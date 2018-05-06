@@ -1,99 +1,103 @@
-#!/bin/bash
+#!/usr/bin/python3
 
-# ==== FUNCTIONS 
+import readline
+import json
+import getopt
+import sys
+import os
+from os.path import expanduser
 
-function usage ()
-{
-    echo "This script allow you to clone a registred repository In order to";
-    echo "clone a reposiory, it has to be written in the bin/repolist.txt file";
-    echo "following theses conventions : ";
-    echo -e "\t - A line should never exceed 3 words.";
-    echo -e "\t - The first word represents the website where the repo is.";
-    echo -e "\t - The second word is the repository name.";
-    echo -e "\t - The last word is the software used to get version the repo.";
-    echo -e "\t (Note the this last word is optional if the website is github)";
-    echo "";
-    echo "Usage : cotorep [options]";
-    echo "List options :";
-    echo -e "\t -h display help for the program.";
-    echo -e "\t -l To display the list of present repositories.";
-}
+repolist = []
+home = expanduser("~")
+repo_file = home + "/bin/repolist.json"
 
-function repo_list () # Should have the repository website in parameter
-{
-    	echo "Here the complete list of repositories in $1:"
-    if [ "$1" == "github" ] ; then 
-	repos=$(grep "$1" $HOME/bin/repolist.txt | cut -d ' ' -f 2);
-    elif [ "$1" == "savane" ] ; then
-	repos=$(grep "$1" $HOME/bin/repolist.txt | grep "$2" | cut -d ' ' -f 2);
-    fi
-    echo "";
-    echo -e "$repos \n";
-}
 
-function full_repo_list ()
-{
-    echo "Github registred repositories : "
-    grep github $HOME/bin/repolist.txt | cut -d ' ' -f 2; echo "";
-    echo "Savane registered repositories using GIT : "
-    grep savane $HOME/bin/repolist.txt | grep git | cut -d ' ' -f 2; echo " ";
-    echo "Savane registered repositories using SVN : ";
-    grep savane $HOME/bin/repolist.txt | grep svn | cut -d ' ' -f 2; echo " ";
-}
+def help():
+    print('This script allows you to clone a registred repositry. The \n')
+    print('wanted repository has to be registred in the repolist.json\n')
+    print('file.\n\n')
+    usage()
 
-# ==== CORE
 
-# SVN style :
-# svn --username julpilleux co https://services.emi.u-bordeaux.fr/projet/svn/<repo>
-# GIT style :
-# git clone https://probakilla@github.com/probakilla/<repo>
+def usage():
+    help()
+    print('USAGE : cotorep [options]\n')
+    print('List of options :\n')
+    print(' -h To display the help for the script')
+    print(' -l To display the full list of repository presents in the file')
 
-# If 2 arguments were entered
 
-if [ "$#" -eq 0 ] ; then 
-    repo="";
-    soft="";
-    
-    echo "Do you want to clone from Github or savane ?"
-    select yn in "Savane" "Github" "Please help, i am a COTOREP !"; do
-	case $yn in
-	    Github ) repo="github"; break;;
-	    Savane ) repo="savane"; break;;
-	    "Please help, i am a COTOREP !" ) firefox https://www.youtube.com/watch?v=SIaU1JLGLd4 ; exit;;
-	esac
-    done
-    
-    if [ "$repo" == "github" ] ; then
-	repo_list "$repo"; # Displaying all repos.;
-	
-	read -p "Enter a repo name : " name;
-	git clone https://probakilla@github.com/probakilla/$name;
-	
-    elif [ "$repo" == "savane" ] ; then
-	echo "Which software do you want to use ?"
-	select yn in "GIT" "SVN"; do
-	    case $yn in
-		GIT ) soft="git"; break;;
-		SVN ) soft="svn"; break;;
-	    esac
-	done
-	repo_list "$repo" "$soft"; # Displaying all repos.
-	
-	read -p "Enter a repo name : " name;
-	
-	if [ "$soft" == "git" ] ; then
-	    git clone https://julpilleux@services.emi.u-bordeaux.fr/projet/git/$name;
-	elif [ "$soft" == "svn" ] ; then
-	    svn --username julpilleux co https://services.emi.u-bordeaux.fr/projet/svn/$name;
-	fi
-    fi
+def list_repositories():
+    with open(repo_file) as json_file:
+        json_data = json.load(json_file)
 
-elif [ "$#" -eq 1 ] ; then
-    if [ "$1" == "-h" ] ; then
-	usage;
-    elif [ "$1" == "-l" ] ; then
-	full_repo_list;
-    fi
-else
-    usage;
-fi
+    print('Github repositories :')
+    for data in json_data['github']['repolist']:
+        print("  " + data)
+    print('Savane git repositories :')
+    for data in json_data['savane']['git']:
+        print("  " + data)
+    print('Savane svn repositories')
+    for data in json_data['savane']['svn']:
+        print("  " + data)
+
+
+def completer(text, state):
+    options = [i for i in repolist if i.startswith(text)]
+    if state < len(options):
+        return options[state]
+    else:
+        return None
+
+
+if __name__ == "__main__":
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hl", ["help", "list"])
+    except getopt.GetoptError as err:
+        print(str(err))
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            help()
+            sys.exit()
+        elif opt in ("-l", "--list"):
+            list_repositories()
+            sys.exit()
+
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(completer)
+
+    repolist = ["github", "savane"]
+    platform = input('Do you want to clone from Github or Savane ?\n')
+
+    if platform == "github":
+        with open(repo_file) as json_file:
+            json_data = json.load(json_file)
+            print('List of Github repositories :')
+            for data in json_data[platform]['repolist']:
+                print("  " + data)
+        repolist = json_data[platform]['repolist']
+        repo = input('Chose one repository to clone :\n')
+        os.system("git clone https://probakilla@github.com/probakilla/" + repo)
+
+    if platform == "savane":
+        with open(repo_file) as json_file:
+            json_data = json.load(json_file)
+        print('List of Savane repositories : ')
+        repolist = ["git", "svn"]
+        prog = input('Chose the subversionning program : \nsvn or git ?\n')
+        if prog == "git":
+            print('List of git repos in Savane :')
+            for data in json_data[platform][prog]:
+                print("  " + data)
+            repolist = json_data[platform][prog]
+            repo = input('Which one do you want to clone ?\n')
+            os.system("git clone https://julpilleux@services.emi.u-bordeaux.fr/projet/git/" + repo)
+        elif prog == "svn":
+            print('List of svn repos in Savane :')
+            for data in json_data[platform][prog]:
+                print("  " + data)
+            repolist = json_data[platform][prog]
+            repo = input('Which one do you want to clone ?\n')
+            os.system("svn --username julpilleux co https://services.emi.u-bordeaux.fr/projet/svn/" + repo)

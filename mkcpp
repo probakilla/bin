@@ -1,9 +1,9 @@
-
 #!/usr/bin/python3
 import getopt
 import sys
 
 # Global vars
+no_out = False
 src_ext = "cpp"
 head_ext = "hpp"
 indent = ""
@@ -17,16 +17,22 @@ derived_name = ""
 
 
 def usage():
-    print("USAGE : mkcpp <filename> [options]")
-    print("Option list :")
-    print(" -h NO ARGS    : Display the usage of the script.")
-    print(" -p NO ARGS    : private/public in the header.")
-    print(" -i NO ARGS    : Create an interface only.")
-    print(" -m NO_ARGS    : Create a main file only.")
-    print(" -c NO_ARGS    : Change the file extentions to cc and hh.")
-    print("                 .cpp and .hpp by default.")
-    print(" -s<namespace> : Name for the namespace, if -s i used.")
-    print(" -d<class_name>: Name of the derived header.")
+    print('USAGE : mkcpp <filename> [options]')
+    print('Option list :')
+    print(' -h, --help\n\t' +
+          'Display the usage of the script and the option list.')
+    print(' -i, --interface\n\t ' +
+          'Create an interface only.')
+    print(' -m, --main\n\t' +
+          'Create a main file only.')
+    print(' -c, -extentions\n\t' +
+          'Change the file extentions to .cc for sources and .hh for' +
+          '\n\theaders. By default, file extentions are .cpp and .hpp')
+    print(' -s NAMESPACE, --namespace=NAMESPACE\n\t ' +
+          'Add a namespace for the created files where NAMESPACE is its name.')
+    print(' -d NAME, --derived=NAME\n\t' +
+          'Add derivation for the created files where NAME is the name' +
+          '\n\tof the derived class.')
 
 
 def headers(file_name):
@@ -36,14 +42,12 @@ def headers(file_name):
     header.write("#ifndef " + upper_name + "_" + upper_ext + "\n")
     header.write("#define " + upper_name + "_" + upper_ext + "\n\n")
 
-    # Derives header
+    # Derives header
     if derived:
         header.write("#include \"" + derived_name + "." + head_ext + "\"\n\n")
-
     # Namespace start
     if namespace:
         header.write("namespace " + namespace_name + "\n" + "{\n")
-
     # Class start
     header.write(indent + "class " + file_name)
     # Is derived
@@ -60,16 +64,14 @@ def headers(file_name):
         header.write(indent + "  virtual ~" + file_name + "() = 0;\n\n")
     else:
         header.write(indent + "  virtual ~" + file_name + "();\n\n")
-    # Private
+    # Private
     if not interface:
         header.write(indent + "private:\n\n")
     # Class end
     header.write(indent + "}\n")
-
     # Namespace end
     if namespace:
         header.write("}\n")
-
     # endif
     header.write("\n#endif // !defined(" + upper_name + "_" + upper_ext + ")")
 
@@ -83,38 +85,30 @@ def source(file_name):
         src.write("#include <iostream>\n\n")
     if not main:
         src.write("#include \"" + file_name + "." + head_ext + "\"\n\n")
-
         if namespace:
             src.write("namespace " + namespace_name + "\n{\n")
             src.write(indent + file_name + "::" + file_name + "() {}\n\n")
             src.write(indent + file_name + "::~" + file_name + "() {}\n")
-
             if namespace:
                 src.write("}")
     if main:
         src.write("\n\nint main ()\n{\n  return EXIT_SUCCESS;\n}")
 
+
 # Main simulation
 if __name__ == "__main__":
-    file_name = sys.argv[1]
-    if file_name[0] == '-':
-        print("File name needed")
-        sys.exit(2)
-
+    # Parsing options
     try:
-        opts, args = getopt.getopt(sys.argv[2:], "himcs:d:", ["help",
-                                                              "interface",
-                                                              "main",
-                                                              "extentions",
-                                                              "namespace=",
-                                                              "derived="])
+        opts, args = getopt.getopt(sys.argv[1:], "himcs:d:",
+                                   ["help", "interface", "main", "extentions",
+                                    "namespace=", "derived="])
     except getopt.GetoptError as err:
         print(str(err) + "\n")
         usage()
         sys.exit(2)
-
     for opt, arg in opts:
         if opt in ("-h", "--help"):
+            no_out = True
             usage()
             sys.exit()
         elif opt in ("-i", "--interface"):
@@ -134,8 +128,12 @@ if __name__ == "__main__":
         else:
             assert False, "Unhandled option"
 
-if not main:
-    headers(sys.argv[1])
-
-if not interface:
-    source(sys.argv[1])
+if not no_out:
+    file_name = sys.argv[1]
+    if file_name[0] == '-':
+        print("File name needed")
+        sys.exit(2)
+    if not main:
+        headers(sys.argv[1])
+    if not interface:
+        source(sys.argv[1])

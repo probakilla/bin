@@ -16,3 +16,4 @@ savane reseauproj git
 savane reversi svn
 savane marioprs git 
 savane rush-hour git
+savane archiloggj git

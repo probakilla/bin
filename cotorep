@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ==== FUNCTIONS 
+# ==== FUNCTIONS
 
 function usage ()
 {
@@ -21,11 +21,11 @@ function usage ()
 
 function repo_list () # Should have the repository website in parameter
 {
-    	echo "Here the complete list of repositories in $1:"
-    if [ "$1" == "github" ] ; then 
-	repos=$(grep "$1" $HOME/bin/repolist.txt | cut -d ' ' -f 2);
+        echo "Here the complete list of repositories in $1:"
+    if [ "$1" == "github" ] ; then
+        repos=$(grep "$1" $HOME/bin/repolist.txt | cut -d ' ' -f 2);
     elif [ "$1" == "savane" ] ; then
-	repos=$(grep "$1" $HOME/bin/repolist.txt | grep "$2" | cut -d ' ' -f 2);
+        repos=$(grep "$1" $HOME/bin/repolist.txt | grep "$2" | cut -d ' ' -f 2);
     fi
     echo "";
     echo -e "$repos \n";
@@ -50,49 +50,45 @@ function full_repo_list ()
 
 # If 2 arguments were entered
 
-if [ "$#" -eq 0 ] ; then 
+if [ "$#" -eq 0 ] ; then
     repo="";
     soft="";
-    
     echo "Do you want to clone from Github or savane ?"
     select yn in "Savane" "Github" "Please help, i am a COTOREP !"; do
-	case $yn in
-	    Github ) repo="github"; break;;
-	    Savane ) repo="savane"; break;;
-	    "Please help, i am a COTOREP !" ) firefox https://www.youtube.com/watch?v=SIaU1JLGLd4 ; exit;;
-	esac
+        case $yn in
+            Github ) repo="github"; break;;
+            Savane ) repo="savane"; break;;
+            "Please help, i am a COTOREP !" ) firefox https://www.youtube.com/watch?v=SIaU1JLGLd4 ; exit;;
+        esac
     done
-    
     if [ "$repo" == "github" ] ; then
-	repo_list "$repo"; # Displaying all repos.;
-	
-	read -p "Enter a repo name : " name;
-	git clone https://probakilla@github.com/probakilla/$name;
-	
+        repo_list "$repo"; # Displaying all repos.;
+
+        read -p "Enter a repo name : " name;
+        git clone https://probakilla@github.com/probakilla/$name;
     elif [ "$repo" == "savane" ] ; then
-	echo "Which software do you want to use ?"
-	select yn in "GIT" "SVN"; do
-	    case $yn in
-		GIT ) soft="git"; break;;
-		SVN ) soft="svn"; break;;
-	    esac
-	done
-	repo_list "$repo" "$soft"; # Displaying all repos.
-	
-	read -p "Enter a repo name : " name;
-	
-	if [ "$soft" == "git" ] ; then
-	    git clone https://julpilleux@services.emi.u-bordeaux.fr/projet/git/$name;
-	elif [ "$soft" == "svn" ] ; then
-	    svn --username julpilleux co https://services.emi.u-bordeaux.fr/projet/svn/$name;
-	fi
+        echo "Which software do you want to use ?"
+        select yn in "GIT" "SVN"; do
+            case $yn in
+                GIT ) soft="git"; break;;
+                SVN ) soft="svn"; break;;
+            esac
+        done
+        repo_list "$repo" "$soft"; # Displaying all repos.
+        read -p "Enter a repo name : " name;
+
+        if [ "$soft" == "git" ] ; then
+            git clone https://julpilleux@services.emi.u-bordeaux.fr/projet/git/$name;
+        elif [ "$soft" == "svn" ] ; then
+            svn --username julpilleux co https://services.emi.u-bordeaux.fr/projet/svn/$name;
+        fi
     fi
 
 elif [ "$#" -eq 1 ] ; then
     if [ "$1" == "-h" ] ; then
-	usage;
+        usage;
     elif [ "$1" == "-l" ] ; then
-	full_repo_list;
+        full_repo_list;
     fi
 else
     usage;

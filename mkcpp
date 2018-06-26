@@ -99,18 +99,19 @@ def source(file_name):
 if __name__ == "__main__":
     # Parsing options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "himcs:d:",
+        opts, args = getopt.getopt(sys.argv[2:], 'himcs:d:',
                                    ["help", "interface", "main", "extentions",
                                     "namespace=", "derived="])
     except getopt.GetoptError as err:
         print(str(err) + "\n")
         usage()
         sys.exit(2)
+
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             no_out = True
             usage()
-            sys.exit()
+            sys.exit(2)
         elif opt in ("-i", "--interface"):
             interface = True
         elif opt in ("-m", "--main"):
@@ -136,4 +137,5 @@ if not no_out:
     if not main:
         headers(sys.argv[1])
     if not interface:
+        print(interface)
         source(sys.argv[1])

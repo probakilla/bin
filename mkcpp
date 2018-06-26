@@ -137,5 +137,4 @@ if not no_out:
     if not main:
         headers(sys.argv[1])
     if not interface:
-        print(interface)
         source(sys.argv[1])

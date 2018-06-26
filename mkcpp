@@ -1,148 +1,139 @@
-#!/bin/bash
+#!/usr/bin/python3
+import getopt
+import sys
 
-#touch $1.hpp $1.cpp
-
-rflag=false
-small_r=false
-big_r=false
-
-function usage ()
-{
-    echo "USAGE : mkcpp <filename>"
-    echo "Options :"
-    echo " -n <file_name>      : name"
-    echo " -s <namespace name> : namespace"
-    echo " -p NO_ARGS          : private/public dans headers"
-    echo " -i NO_ARGS          : interface only"
-    echo " -m NO_ARGS          : main file only"
-    echo " -d <class_name>     : derived header"
-}
-
-function mk_header () # 1:NAME 2:DERIV 3:PUBLIC/PRIVATE 4:NAMESPACE 5:INTERFACE
-{
-    touch $1.hpp;
-    upper=$(echo -n $1 | awk '{print toupper($0)}');
-    echo \#ifndef $upper\_HPP >> $1.hpp;
-    echo \#define $upper\_HPP >> $1.hpp;
-    echo "" >> $1.hpp;
-    
-    if [ "$deriv" != "-1" ] ; then
-	echo \#include \"$2.hpp\" >> $1.hpp;
-	echo "" >> $1.hpp;
-    fi
-    
-    if [ "$namespace" != "-1" ] ; then
-	echo "namespace $4" >> $1.hpp;
-	echo "{" >> $1.hpp;
-    fi
-    echo -n -e "\tclass $1 " >> $1.hpp;
-    if [ "$deriv" != "-1" ] ; then
-	echo ": public $2" >> $1.hpp;
-	echo -e "\t{" >> $1.hpp;
-    else
-	echo "" >> $1.hpp;
-	echo -e "\t{" >> $1.hpp;
-    fi
-
-    if [ "$visibility" != "-1" ] ; then
-	echo -e "\tpublic:" >> $1.hpp;
-	if [ "$interface" == "-1" ] ; then
-	    echo -e "\t\t$1 ();" >> $1.hpp;
-	    if [ "$deriv" == "-1" ] ; then
-		echo -e "\t\tvirtual ~$1 ();" >> $1.hpp;
-	    else
-		echo -e "\t\t~$1 ();" >> $1.hpp;
-	    fi
-	else
-	    echo -e "\t\tvirtual $1 () = 0;" >> $1.hpp;
-	    echo -e "\t\tvirtual ~$1 () = 0;" >> $1.hpp;
-	fi
-	echo -e "\tprivate:" >> $1.hpp;
-    fi
-    echo -e "\t};" >> $1.hpp;
-
-    if [ "$namespace" != "-1" ] ; then
-	echo "}" >> $1.hpp;
-    fi
-
-    echo \#endif /\* !defined\($upper\_HPP\) \*/ >> $1.hpp;
-}
+# Global vars
+no_out = False
+src_ext = "cpp"
+head_ext = "hpp"
+indent = ""
+private_mbr = False
+interface = False
+main = False
+namespace = False
+namespace_name = ""
+derived = False
+derived_name = ""
 
 
-function mk_src () # 1:NAME 2:NAMESPACE
-{
-    scr_name=$1.cpp;
-    touch $1.cpp;
-    
-    if [ "$main" == "-1" ] ; then
-	echo \#include \"$1.hpp\" >> $1.cpp;
-	echo "" >> $1.cpp;
-	if [ "$namespace" != "-1" ] ; then
-	    echo "namespace $2" >> $1.cpp;
-	    echo "{" >> $1.cpp;  
-	fi
-	echo "$1::$1 () {}" >> $1.cpp;
-	echo "$1::~$1 () {}" >> $1.cpp;
-	if [ "$namespace" != "-1" ] ; then
-	    echo "}" >> $1.cpp;  
-	fi
-    else
-	echo "int main ()" >> $1.cpp;
-	echo "{" >> $1.cpp;
-	echo -e "return EXIT_SUCCESS;" >> $1.cpp;
-	echo "}" >> $1.cpp;
-    fi
-}
+def usage():
+    print('USAGE : mkcpp <filename> [options]')
+    print('Option list :')
+    print(' -h, --help\n\t' +
+          'Display the usage of the script and the option list.')
+    print(' -i, --interface\n\t ' +
+          'Create an interface only.')
+    print(' -m, --main\n\t' +
+          'Create a main file only.')
+    print(' -c, -extentions\n\t' +
+          'Change the file extentions to .cc for sources and .hh for' +
+          '\n\theaders. By default, file extentions are .cpp and .hpp')
+    print(' -s NAMESPACE, --namespace=NAMESPACE\n\t ' +
+          'Add a namespace for the created files where NAMESPACE is its name.')
+    print(' -d NAME, --derived=NAME\n\t' +
+          'Add derivation for the created files where NAME is the name' +
+          '\n\tof the derived class.')
 
-main="-1";
-deriv="-1";
-namepsace="-1";
-visibility="-1";
-interface="-1";
-name="-1";
 
-options=":s:d:n:pim"
+def headers(file_name):
+    header = open(file_name + "." + head_ext, "w")
+    upper_name = file_name.upper()
+    upper_ext = head_ext.upper()
+    header.write("#ifndef " + upper_name + "_" + upper_ext + "\n")
+    header.write("#define " + upper_name + "_" + upper_ext + "\n\n")
 
-while getopts $options opt 
-do
-    case $opt in
-	n )
-	    name=$OPTARG;;
-	s )
-	    namespace=$OPTARG;;
-	d )
-	    deriv=$OPTARG;;
-	p )
-	    visibility=1;;
-	i )
-	    interface=1;;
-	m )
-	    main=1;;
-	\?)
-	    echo "Option unknown.";
-	    usage;
-	    exit;;
-	: )
-	    echo "Missing argument.";
-	    usage;
-	    exit;;
-    esac
-done
+    # Derives header
+    if derived:
+        header.write("#include \"" + derived_name + "." + head_ext + "\"\n\n")
+    # Namespace start
+    if namespace:
+        header.write("namespace " + namespace_name + "\n" + "{\n")
+    # Class start
+    header.write(indent + "class " + file_name)
+    # Is derived
+    if derived:
+        header.write(" : public " + derived_name)
+    header.write("\n" + indent + "{\n")
+    # Visibility
+    header.write(indent + "public:\n")
+    # Constructor
+    if not interface:
+        header.write(indent + "  " + file_name + "();\n\n")
+    # Destructor
+    if interface:
+        header.write(indent + "  virtual ~" + file_name + "() = 0;\n\n")
+    else:
+        header.write(indent + "  virtual ~" + file_name + "();\n\n")
+    # Private
+    if not interface:
+        header.write(indent + "private:\n\n")
+    # Class end
+    header.write(indent + "}\n")
+    # Namespace end
+    if namespace:
+        header.write("}\n")
+    # endif
+    header.write("\n#endif // !defined(" + upper_name + "_" + upper_ext + ")")
 
-if [ "$name" == "-1" ] ; then
-    echo "Please insert a name."
-    usage;
-    exit;
-fi
+    header.close()
+# END HEADERS
 
-if [ "$main" == "1" ] ; then
-    mk_src $name $namepsace;
-    exit;
-elif [ "$interface" == "1" ] ; then
-    mk_header $name $deriv $visibility $namespace $interface;
-    exit;
-else
-    mk_src $name $namespace;
-    mk_header $name $deriv $visibility $namespace $interface;
-    exit;
-fi
+
+def source(file_name):
+    src = open(file_name + "." + src_ext, "w")
+    if main:
+        src.write("#include <iostream>\n\n")
+    if not main:
+        src.write("#include \"" + file_name + "." + head_ext + "\"\n\n")
+        if namespace:
+            src.write("namespace " + namespace_name + "\n{\n")
+            src.write(indent + file_name + "::" + file_name + "() {}\n\n")
+            src.write(indent + file_name + "::~" + file_name + "() {}\n")
+            if namespace:
+                src.write("}")
+    if main:
+        src.write("\n\nint main ()\n{\n  return EXIT_SUCCESS;\n}")
+
+
+# Main simulation
+if __name__ == "__main__":
+    # Parsing options
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "himcs:d:",
+                                   ["help", "interface", "main", "extentions",
+                                    "namespace=", "derived="])
+    except getopt.GetoptError as err:
+        print(str(err) + "\n")
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            no_out = True
+            usage()
+            sys.exit()
+        elif opt in ("-i", "--interface"):
+            interface = True
+        elif opt in ("-m", "--main"):
+            main = True
+        elif opt in ("-c", "--extentions"):
+            src_ext = "cc"
+            head_ext = "hh"
+        elif opt in ("-s", "--namespace"):
+            namespace = True
+            namespace_name = arg
+            indent = "  "
+        elif opt in ("-d", "--derived"):
+            derived = True
+            derived_name = arg
+        else:
+            assert False, "Unhandled option"
+
+if not no_out:
+    file_name = sys.argv[1]
+    if file_name[0] == '-':
+        print("File name needed")
+        sys.exit(2)
+    if not main:
+        headers(sys.argv[1])
+    if not interface:
+        source(sys.argv[1])

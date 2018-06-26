@@ -12,7 +12,6 @@
 ;;      ac-etags
 ;;      auto-complete-c-headers
 ;;      auto-complete-clang
-;;      yasnippets
 ;; Misc :
 ;;      auto-correct
 ;;      auto-package-update
@@ -34,10 +33,11 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
- '(custom-enabled-themes (quote (manoj-dark)))
+ '(custom-enabled-themes nil)
+ '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (iedit yasnippet yasnippet-snippets ac-c-headers ac-clang auto-complete-sage auto-complete-pcmp \\ auto-complete-nxml auto-complete-clang-async bison-mode \\ auto-correct auto-complete-exuberant-ctags auto-complete-clang\\ auto-complete-c-headers))))
+    (cmake-mode xcscope clang-format flycheck-clang-tidy iedit ac-c-headers ac-clang auto-complete-sage auto-complete-pcmp \\ auto-complete-nxml auto-complete-clang-async bison-mode \\ auto-correct auto-complete-exuberant-ctags auto-complete-clang\\ auto-complete-c-headers))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -48,6 +48,7 @@
 
 ;; ==== PACKAGE LOAD MANAGEMENT ====
 (add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'exec-path "~/.emacs.d/")
 ;; Auto pair chars like parenthesis or braces - auto launch.
 (require 'autopair)
 (autopair-global-mode)
@@ -55,16 +56,11 @@
 ;; Auto-update - auto launch
 (add-to-list 'load-path "/path/to/auto-package-update")
 (require 'auto-package-update)
-;; OPTIONAL: ADD IT ONLY IF YOU USE C/C++.
-(semantic-mode 1) ;; -> this is optional for Lisp
 
 ;; Starting with auto-complete-mode
 (require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
-;; Starting with yasnippet (auto generate if statements etc...)
-(require 'yasnippet)
-(yas-global-mode 1)
 
 (defun my:ac-c-headers-init ()
   (require 'auto-complete-c-headers)
@@ -93,11 +89,35 @@
 (global-ede-mode 1)
 ;; Tell ede where the project is
 ;; Reversi project
-(ede-cpp-root-project "reversi" :file "~/fac/reversi/code/src/main.cc"
-		      :include-path '("~/fac/reversi/code/include/core"
-				      "~/fac/reversi/code/include/player"))
-(ede-cpp-root-project "reversi_test" :file "~/fac/reversi/code/tests_main.cc"
-		      :include-path '("./include"))
+(ede-cpp-root-project "reversi"
+                      :file "~/espaces/travail/reversi/code/src/main.cc"
+                      :include-path '("../include/core"
+                                      "../include/player" "../tests")
+                      :system-include-path '("/usr/include/c++"))
+
+(ede-cpp-root-project "editor"
+                      :file "~/espaces/travail/archiloggj/code/build/Makefile"
+                      :include-path '("../include/model")
+                      :system-include-path '("/usr/include/c++"))
+
+
+
+(require 'fill-column-indicator)
+(setq fci-rule-column 80)
+(setq fci-rule-width 1)
+(setq fci-rule-color "red")
+
+(add-to-list 'fci-mode 'latex-mode)
+
+(require 'clang-format)
+(setq clang-format-style-option "file")
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (ggtags-mode 1))))
+
+;;(global-whitespace-mode 1)
 ;; ==== PACKAGE LOAD MANAGEMENT ====
 
 ;; ==== CODING STYLE ====
@@ -117,4 +137,8 @@
 (global-set-key (kbd "C-e") 'visit-tags-table)
 ;; Iedit bind
 (global-set-key (kbd "C-;") 'iedit-mode)
+(global-set-key (kbd "C-c i") 'clang-format-region)
+(global-set-key (kbd "C-c u") 'clang-format-buffer)
+(global-set-key (kbd "M-<left>") 'switch-to-prev-buffer)
+(global-set-key (kbd "M-<right>") 'switch-to-next-buffer)
 ;; ==== CUSTOM BINDS ====

@@ -14,6 +14,8 @@ namespace = False
 namespace_name = ""
 derived = False
 derived_name = ""
+alt_src_location = ""
+alt_inc_location = ""
 
 
 def usage():
@@ -33,10 +35,16 @@ def usage():
     print(' -d NAME, --derived=NAME\n\t' +
           'Add derivation for the created files where NAME is the name' +
           '\n\tof the derived class.')
-
+    print(' -r LOCATION, --src_location=LOCATION\n\t' +
+          'Secify a location for the generated source file where LOCATION is the' +
+          'path to the wanted folder.')
+    print(' -n LOCATION, --inc_location=LOCATION\n\t' +
+          'Secify a location for the generated header file where LOCATION is the' +
+          'path to the wanted folder.')
+#END USAGE
 
 def headers(file_name):
-    header = open(file_name + "." + head_ext, "w")
+    header = open(alt_inc_location + file_name + "." + head_ext, "w")
     upper_name = file_name.upper()
     upper_ext = head_ext.upper()
     header.write("#ifndef " + upper_name + "_" + upper_ext + "\n")
@@ -81,7 +89,7 @@ def headers(file_name):
 
 
 def source(file_name):
-    src = open(file_name + "." + src_ext, "w")
+    src = open(alt_src_location + file_name + "." + src_ext, "w")
     if main:
         src.write("#include <iostream>\n\n")
     if not main:
@@ -102,9 +110,10 @@ def source(file_name):
 if __name__ == "__main__":
     # Parsing options
     try:
-        opts, args = getopt.getopt(sys.argv[2:], 'himcs:d:',
+        opts, args = getopt.getopt(sys.argv[2:], 'himcs:d:r:n:',
                                    ["help", "interface", "main", "extentions",
-                                    "namespace=", "derived="])
+                                    "namespace=", "derived=", "src_location=",
+                                    "inc_location="])
     except getopt.GetoptError as err:
         print(str(err) + "\n")
         usage()
@@ -129,6 +138,10 @@ if __name__ == "__main__":
         elif opt in ("-d", "--derived"):
             derived = True
             derived_name = arg
+        elif opt in ("-r", "--src_location"):
+            alt_src_location = arg + "/"
+        elif opt in ("-n", "--inc_location"):
+            alt_inc_location = arg + "/"
         else:
             assert False, "Unhandled option"
 
@@ -139,6 +152,5 @@ if not no_out:
         sys.exit(2)
     if not main:
         headers(sys.argv[1])
-
     if not interface:
         source(sys.argv[1])

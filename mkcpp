@@ -76,6 +76,7 @@ def headers(file_name):
     header.write("\n#endif // !defined(" + upper_name + "_" + upper_ext + ")")
 
     header.close()
+    print ("File " + file_name + "." + head_ext + " generated.")
 # END HEADERS
 
 
@@ -93,6 +94,8 @@ def source(file_name):
                 src.write("}")
     if main:
         src.write("\n\nint main ()\n{\n  return EXIT_SUCCESS;\n}")
+    print ("File : " + file_name + "." + src_ext + " genereted.")
+# END SOURCE
 
 
 # Main simulation
@@ -136,5 +139,6 @@ if not no_out:
         sys.exit(2)
     if not main:
         headers(sys.argv[1])
+
     if not interface:
         source(sys.argv[1])

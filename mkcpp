@@ -84,7 +84,7 @@ def headers(file_name):
     header.write("\n#endif // !defined(" + upper_name + "_" + upper_ext + ")")
 
     header.close()
-    print ("File " + file_name + "." + head_ext + " generated.")
+    print ("File " + alt_inc_location + file_name + "." + head_ext + " generated.")
 # END HEADERS
 
 
@@ -102,7 +102,7 @@ def source(file_name):
                 src.write("}")
     if main:
         src.write("\n\nint main ()\n{\n  return EXIT_SUCCESS;\n}")
-    print ("File : " + file_name + "." + src_ext + " genereted.")
+    print ("File " + alt_src_location + file_name + "." + src_ext + " genereted.")
 # END SOURCE
 
 

@@ -68,7 +68,7 @@ def headers(file_name):
     if not interface:
         header.write(indent + "private:\n\n")
     # Class end
-    header.write(indent + "}\n")
+    header.write(indent + "};\n")
     # Namespace end
     if namespace:
         header.write("}\n")

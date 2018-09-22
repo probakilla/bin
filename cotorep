@@ -12,7 +12,7 @@ repolist = []
 # Absolute path to $HOME
 home = expanduser("~")
 # json file path (static one)
-repo_file = home + "/bin/repolist.json"
+repo_file = home + "/bin/.repolist.json"
 
 
 # Display a quick help for the script and also the usage

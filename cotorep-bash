@@ -23,9 +23,9 @@ function repo_list () # Should have the repository website in parameter
 {
     	echo "Here the complete list of repositories in $1:"
     if [ "$1" == "github" ] ; then 
-	repos=$(grep "$1" $HOME/bin/repolist.txt | cut -d ' ' -f 2);
+	repos=$(grep "$1" $HOME/bin/.repolist.txt | cut -d ' ' -f 2);
     elif [ "$1" == "savane" ] ; then
-	repos=$(grep "$1" $HOME/bin/repolist.txt | grep "$2" | cut -d ' ' -f 2);
+	repos=$(grep "$1" $HOME/bin/.repolist.txt | grep "$2" | cut -d ' ' -f 2);
     fi
     echo "";
     echo -e "$repos \n";

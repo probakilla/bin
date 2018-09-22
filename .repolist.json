@@ -9,7 +9,18 @@
           "CC",
           "pellarudo",
           "anamorphose",
-	  "archilog_cours"
+	  "archilog_cours",
+	  "archilog_project",
+	  "cf_project",
+	  "rodin_project",
+	  "compil_project",
+	  "stereovision",
+	  "labyrinth_java",
+	  "reversi",
+	  "reseau-project",
+	  "progsys_project",
+	  "rush_hour",
+	  "website"
       ]
     },
 

@@ -5,6 +5,16 @@ github euro_conv
 github CC
 github pellarudo
 github anamorphose
+github archilog_cours
+github cf_project
+github rodin_project
+github compil_project
+github stereovision
+github labyrinth_java
+github reseau_project
+github progsys_project
+github rush_hour
+github website
 savane archilog git 
 savane bidet git
 savane compil git

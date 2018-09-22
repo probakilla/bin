@@ -1,0 +1,35 @@
+{
+    "github" :
+    { "repolist" :
+      [
+          "bin",
+          "reversi",
+          "perudo",
+          "euro_conv",
+          "CC",
+          "pellarudo",
+          "anamorphose",
+	  "archilog_cours"
+      ]
+    },
+
+    "savane":
+    {
+        "git":
+        [
+            "archilog",
+            "bidet",
+            "compil",
+            "julpilleux",
+            "labyrinthe",
+            "perudo",
+            "projetcompi",
+            "reseauproj",
+            "marioprs",
+            "rush-hour",
+	    "progweb"
+        ],
+
+        "svn": ["reversi"]
+    }
+}

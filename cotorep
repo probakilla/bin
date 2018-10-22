@@ -92,7 +92,7 @@ if __name__ == "__main__":
                 print("  " + data)
         repolist = json_data[platform]['repolist']  # Changing words pool
         repo = input('Chose one repository to clone :\n')
-        os.system("git clone https://probakilla@github.com/probakilla/" + repo)
+        os.system("git clone ssh://git@github.com/probakilla/" + repo)
         json_file.close()
 
     # The user selected savane

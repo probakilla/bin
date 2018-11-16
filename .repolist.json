@@ -21,8 +21,7 @@
 	  "progsys_project",
 	  "rush_hour",
 	  "website",
-	  "cv",
-	  "progweb"
+	  "ProjetWeb"
       ]
     },
 
@@ -40,8 +39,13 @@
             "reseauproj",
             "marioprs",
             "rush-hour",
-	    "progweb",
-	    "apfoot"
+	    "progweb"
+        ],
+
+        "svn": ["reversi"]
+    }
+}
+
         ],
 
         "svn": ["reversi"]

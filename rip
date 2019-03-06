@@ -36,22 +36,24 @@ function kill_loop ()
    done
 }
 
-
+   
 # Cas par defaut (envoie un sigterm)
 if [ $# -eq 1 ]; then
     # 15 est le numéro de sigterm.
     kill_loop $1 15 "terminated"
-
+    
 elif [ $# -eq 2 ]; then
     if [[ "$1" -eq "-k" ]]; then
         kill_loop $2 9 "killed"
-
+	
     elif [[ "$1" -eq "-t" ]]; then
-        kill_loop $2 15 "terminated"
-
+	kill_loop $2 15 "terminated"
+	
     else
-        func_usage
+	func_usage
     fi
 else
     func_usage
+fi
+e
 fi

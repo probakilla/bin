@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+for i in `seq $1` ; do echo $3 | Mail -s "$2" $4.$5@etu.u-bordeaux.fr 2> /dev/null ; done &

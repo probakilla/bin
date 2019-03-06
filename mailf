@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ $# -ne 3 ]]; then
+    echo "usage : mailf prenom nom fichier"
+
+
+else
+    cat $3 | mail -s "envoi fichier" $1.$2@etu.u-bordeaux.fr
+    echo "message envoye"
+
+fi

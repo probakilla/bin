@@ -6,7 +6,8 @@
 function func_usage ()
 {
     echo "Warning, this script may kill unwanted process."
-    echo "Usage : rip [options] <process_name>"
+    echo "Usage : rip <process_name> [options]"
+    echo "Order is important"
     echo ""
     echo "Without options, this send SIGTERM to all process found."
     echo ""
@@ -36,24 +37,42 @@ function kill_loop ()
    done
 }
 
-   
-# Cas par defaut (envoie un sigterm)
-if [ $# -eq 1 ]; then
-    # 15 est le numéro de sigterm.
-    kill_loop $1 15 "terminated"
-    
-elif [ $# -eq 2 ]; then
-    if [[ "$1" -eq "-k" ]]; then
-        kill_loop $2 9 "killed"
-	
-    elif [[ "$1" -eq "-t" ]]; then
-	kill_loop $2 15 "terminated"
-	
-    else
-	func_usage
-    fi
-else
+REQUIRED=false
+SIGNAL_CODE=15
+PROCESS=""
+
+if (( "$#" < "1" )); then
     func_usage
+    exit
 fi
-e
+
+PROCESS=$1
+
+if [ ${PROCESS::1} == "-" ]; then
+    echo "Missing process name"
+    func_usage
+    exit
 fi
+
+shift $((OPTIND))
+
+while getopts "kh" opt; do
+    case ${opt} in
+	k)
+	    SIGNAL_CODE=9
+	    ;;
+	h)
+	    func_usage
+	    ;;
+	*)
+	    func_usage
+	    exit
+	    ;;
+	\?)
+	    func_usage
+	    exit
+	    ;;
+    esac
+done
+
+kill_loop $PROCESS $SIGNAL_CODE "killed"

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+os=$(uname -ra)
+
+if [[ $os != *"Microsoft"* ]]; then
+	echo "Not in a WSL"
+else
+	cmd.exe /C start "Launching from BASH" "$*"
+fi
+

@@ -3,8 +3,7 @@
 # Attention, ceci est un yolo script et peut potentiellement
 # kill des trucs qu'il ne faut pas :]
 
-function func_usage ()
-{
+function func_usage() {
     echo "Warning, this script may kill unwanted process."
     echo "Usage : rip <process_name> [options]"
     echo "Order is important"
@@ -18,30 +17,29 @@ function func_usage ()
 
 # Le prmier paramètre est le nom du processus.
 # Le deuxieme est le numéro du signal.
-function kill_loop ()
-{
+function kill_loop() {
     # Nombres de processus trouvé avec le paramètre d'entrée.
-   NB_LINES=$(ps -ux | grep $1 | wc | cut -b 5-7)
-   NB_ZBI=$(($NB_LINES - 2)) # On enlève 2 au NB_LINES parce que ??????
+    NB_LINES=$(ps -ux | grep $1 | wc | cut -b 5-7)
+    NB_ZBI=$(($NB_LINES - 2)) # On enlève 2 au NB_LINES parce que ??????
 
-   # Si NB_LINES est égal à 3, alors le processus n'est pas trouve.
-   if [ $NB_LINES -eq 3 ]; then
-       echo "ERROR : Process not found"
-       exit
-   fi
-   # Envoie SIGKILL à tout les processus trouves.
-   for i in `seq 1 $NB_ZBI`; do
-       PID=$(ps -ux | grep $1 | cut -b 10-15 | sed -n $i\p)
-       kill -$2 $PID 2> /dev/null
-       echo "process $PID $3."
-   done
+    # Si NB_LINES est égal à 3, alors le processus n'est pas trouve.
+    if [ $NB_LINES -eq 3 ]; then
+        echo "ERROR : Process not found"
+        exit
+    fi
+    # Envoie SIGKILL à tout les processus trouves.
+    for i in $(seq 1 $NB_ZBI); do
+        PID=$(ps -ux | grep $1 | cut -b 10-15 | sed -n $i\p)
+        kill -$2 $PID 2>/dev/null
+        echo "process $PID $3."
+    done
 }
 
 REQUIRED=false
 SIGNAL_CODE=15
 PROCESS=""
 
-if (( "$#" < "1" )); then
+if (("$#" < "1")); then
     func_usage
     exit
 fi
@@ -58,20 +56,20 @@ shift $((OPTIND))
 
 while getopts "kh" opt; do
     case ${opt} in
-	k)
-	    SIGNAL_CODE=9
-	    ;;
-	h)
-	    func_usage
-	    ;;
-	*)
-	    func_usage
-	    exit
-	    ;;
-	\?)
-	    func_usage
-	    exit
-	    ;;
+    k)
+        SIGNAL_CODE=9
+        ;;
+    h)
+        func_usage
+        ;;
+    *)
+        func_usage
+        exit
+        ;;
+    \?)
+        func_usage
+        exit
+        ;;
     esac
 done
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-while [ true ];
-do
-	eject;
-	eject -t;
+while [ true ]; do
+	eject
+	eject -t
 done

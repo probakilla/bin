@@ -6,143 +6,146 @@ rflag=false
 small_r=false
 big_r=false
 
-function usage ()
-{
-    echo "USAGE : mkcpp <filename>"
-    echo "Options :"
-    echo " -n <file_name>      : name"
-    echo " -s <namespace name> : namespace"
-    echo " -p NO_ARGS          : private/public dans headers"
-    echo " -i NO_ARGS          : interface only"
-    echo " -m NO_ARGS          : main file only"
-    echo " -d <class_name>     : derived header"
+function usage() {
+	echo "USAGE : mkcpp <filename>"
+	echo "Options :"
+	echo " -n <file_name>      : name"
+	echo " -s <namespace name> : namespace"
+	echo " -p NO_ARGS          : private/public dans headers"
+	echo " -i NO_ARGS          : interface only"
+	echo " -m NO_ARGS          : main file only"
+	echo " -d <class_name>     : derived header"
 }
 
-function mk_header () # 1:NAME 2:DERIV 3:PUBLIC/PRIVATE 4:NAMESPACE 5:INTERFACE
-{
-    touch $1.hpp;
-    upper=$(echo -n $1 | awk '{print toupper($0)}');
-    echo \#ifndef $upper\_HPP >> $1.hpp;
-    echo \#define $upper\_HPP >> $1.hpp;
-    echo "" >> $1.hpp;
-    
-    if [ "$deriv" != "-1" ] ; then
-	echo \#include \"$2.hpp\" >> $1.hpp;
-	echo "" >> $1.hpp;
-    fi
-    
-    if [ "$namespace" != "-1" ] ; then
-	echo "namespace $4" >> $1.hpp;
-	echo "{" >> $1.hpp;
-    fi
-    echo -n -e "\tclass $1 " >> $1.hpp;
-    if [ "$deriv" != "-1" ] ; then
-	echo ": public $2" >> $1.hpp;
-	echo -e "\t{" >> $1.hpp;
-    else
-	echo "" >> $1.hpp;
-	echo -e "\t{" >> $1.hpp;
-    fi
+function mk_header() { # 1:NAME 2:DERIV 3:PUBLIC/PRIVATE 4:NAMESPACE 5:INTERFACE
+	touch $1.hpp
+	upper=$(echo -n $1 | awk '{print toupper($0)}')
+	echo \#ifndef $upper\_HPP >>$1.hpp
+	echo \#define $upper\_HPP >>$1.hpp
+	echo "" >>$1.hpp
 
-    if [ "$visibility" != "-1" ] ; then
-	echo -e "\tpublic:" >> $1.hpp;
-	if [ "$interface" == "-1" ] ; then
-	    echo -e "\t\t$1 ();" >> $1.hpp;
-	    if [ "$deriv" == "-1" ] ; then
-		echo -e "\t\tvirtual ~$1 ();" >> $1.hpp;
-	    else
-		echo -e "\t\t~$1 ();" >> $1.hpp;
-	    fi
+	if [ "$deriv" != "-1" ]; then
+		echo \#include \"$2.hpp\" >>$1.hpp
+		echo "" >>$1.hpp
+	fi
+
+	if [ "$namespace" != "-1" ]; then
+		echo "namespace $4" >>$1.hpp
+		echo "{" >>$1.hpp
+	fi
+	echo -n -e "\tclass $1 " >>$1.hpp
+	if [ "$deriv" != "-1" ]; then
+		echo ": public $2" >>$1.hpp
+		echo -e "\t{" >>$1.hpp
 	else
-	    echo -e "\t\tvirtual $1 () = 0;" >> $1.hpp;
-	    echo -e "\t\tvirtual ~$1 () = 0;" >> $1.hpp;
+		echo "" >>$1.hpp
+		echo -e "\t{" >>$1.hpp
 	fi
-	echo -e "\tprivate:" >> $1.hpp;
-    fi
-    echo -e "\t};" >> $1.hpp;
 
-    if [ "$namespace" != "-1" ] ; then
-	echo "}" >> $1.hpp;
-    fi
+	if [ "$visibility" != "-1" ]; then
+		echo -e "\tpublic:" >>$1.hpp
+		if [ "$interface" == "-1" ]; then
+			echo -e "\t\t$1 ();" >>$1.hpp
+			if [ "$deriv" == "-1" ]; then
+				echo -e "\t\tvirtual ~$1 ();" >>$1.hpp
+			else
+				echo -e "\t\t~$1 ();" >>$1.hpp
+			fi
+		else
+			echo -e "\t\tvirtual $1 () = 0;" >>$1.hpp
+			echo -e "\t\tvirtual ~$1 () = 0;" >>$1.hpp
+		fi
+		echo -e "\tprivate:" >>$1.hpp
+	fi
+	echo -e "\t};" >>$1.hpp
 
-    echo \#endif /\* !defined\($upper\_HPP\) \*/ >> $1.hpp;
+	if [ "$namespace" != "-1" ]; then
+		echo "}" >>$1.hpp
+	fi
+
+	echo \#endif /\* !defined\($upper\_HPP\) \*/ >>$1.hpp
 }
 
+function mk_src() { # 1:NAME 2:NAMESPACE
+	scr_name=$1.cpp
+	touch $1.cpp
 
-function mk_src () # 1:NAME 2:NAMESPACE
-{
-    scr_name=$1.cpp;
-    touch $1.cpp;
-    
-    if [ "$main" == "-1" ] ; then
-	echo \#include \"$1.hpp\" >> $1.cpp;
-	echo "" >> $1.cpp;
-	if [ "$namespace" != "-1" ] ; then
-	    echo "namespace $2" >> $1.cpp;
-	    echo "{" >> $1.cpp;  
+	if [ "$main" == "-1" ]; then
+		echo \#include \"$1.hpp\" >>$1.cpp
+		echo "" >>$1.cpp
+		if [ "$namespace" != "-1" ]; then
+			echo "namespace $2" >>$1.cpp
+			echo "{" >>$1.cpp
+		fi
+		echo "$1::$1 () {}" >>$1.cpp
+		echo "$1::~$1 () {}" >>$1.cpp
+		if [ "$namespace" != "-1" ]; then
+			echo "}" >>$1.cpp
+		fi
+	else
+		echo "int main ()" >>$1.cpp
+		echo "{" >>$1.cpp
+		echo -e "return EXIT_SUCCESS;" >>$1.cpp
+		echo "}" >>$1.cpp
 	fi
-	echo "$1::$1 () {}" >> $1.cpp;
-	echo "$1::~$1 () {}" >> $1.cpp;
-	if [ "$namespace" != "-1" ] ; then
-	    echo "}" >> $1.cpp;  
-	fi
-    else
-	echo "int main ()" >> $1.cpp;
-	echo "{" >> $1.cpp;
-	echo -e "return EXIT_SUCCESS;" >> $1.cpp;
-	echo "}" >> $1.cpp;
-    fi
 }
 
-main="-1";
-deriv="-1";
-namepsace="-1";
-visibility="-1";
-interface="-1";
-name="-1";
+main="-1"
+deriv="-1"
+namepsace="-1"
+visibility="-1"
+interface="-1"
+name="-1"
 
 options=":s:d:n:pim"
 
-while getopts $options opt 
-do
-    case $opt in
-	n )
-	    name=$OPTARG;;
-	s )
-	    namespace=$OPTARG;;
-	d )
-	    deriv=$OPTARG;;
-	p )
-	    visibility=1;;
-	i )
-	    interface=1;;
-	m )
-	    main=1;;
+while getopts $options opt; do
+	case $opt in
+	n)
+		name=$OPTARG
+		;;
+	s)
+		namespace=$OPTARG
+		;;
+	d)
+		deriv=$OPTARG
+		;;
+	p)
+		visibility=1
+		;;
+	i)
+		interface=1
+		;;
+	m)
+		main=1
+		;;
 	\?)
-	    echo "Option unknown.";
-	    usage;
-	    exit;;
-	: )
-	    echo "Missing argument.";
-	    usage;
-	    exit;;
-    esac
+		echo "Option unknown."
+		usage
+		exit
+		;;
+	:)
+		echo "Missing argument."
+		usage
+		exit
+		;;
+	esac
 done
 
-if [ "$name" == "-1" ] ; then
-    echo "Please insert a name."
-    usage;
-    exit;
+if [ "$name" == "-1" ]; then
+	echo "Please insert a name."
+	usage
+	exit
 fi
 
-if [ "$main" == "1" ] ; then
-    mk_src $name $namepsace;
-    exit;
-elif [ "$interface" == "1" ] ; then
-    mk_header $name $deriv $visibility $namespace $interface;
-    exit;
+if [ "$main" == "1" ]; then
+	mk_src $name $namepsace
+	exit
+elif [ "$interface" == "1" ]; then
+	mk_header $name $deriv $visibility $namespace $interface
+	exit
 else
-    mk_src $name $namespace;
-    mk_header $name $deriv $visibility $namespace $interface;
-    exit;
+	mk_src $name $namespace
+	mk_header $name $deriv $visibility $namespace $interface
+	exit
 fi

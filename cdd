@@ -1,0 +1,10 @@
+#!/bin/bash
+
+RESOURCE_FILE=$HOME/bin/resources/directory_list
+folder_path=$(cat $RESOURCE_FILE | grep $1 | cut -d : -f2)
+
+if [[ -e "$folder_path" ]]; then
+	cd $folder_path
+else
+	echo "Folder not found in $RESOURCE_FILE"
+fi

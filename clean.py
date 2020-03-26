@@ -1,6 +1,10 @@
+#!/usr/bin/python3.7
+"""
+Clean the whole current directory
+"""
 from os import remove
 
-file_list = (".urls.txt", ".diff.txt")
+FILE_LIST = (".urls.txt", ".diff.txt")
 
-for f in file_list:
+for f in FILE_LIST:
     remove(f)

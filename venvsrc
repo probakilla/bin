@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function usage() {
+	echo "Usage: venvsrc <venv name>"
+}
+
+function error_msg() {
+	echo -e "\033[31mERROR\033[0m Need one argument"
+	usage
+}
+
+function src_venv() {
+    local venv_name=$1
+    source $venv_name/bin/activate
+}
+
+
+[ $# != 1 ] && error_msg || src_venv $1

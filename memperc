@@ -1,0 +1,7 @@
+#!/bin/bash
+
+stats="$(free -m | tail -2 | head -1 | sed 's/  */ /g')"
+used="$(echo $stats | cut -d' ' -f3)"
+total="$(echo $stats | cut -d' ' -f2)"
+let "perc = used * 100 / total"
+echo $perc
